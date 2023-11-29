@@ -40,14 +40,15 @@ class MIDASreader:
         self.subidx=0
         self.__next_subrun__()
         
-        MIDASconf={"proto0":{"ADC":'V1725',"BANKS":["W200","W201","W202","W203"],'bin':4},
-                   "dart":{"ADC":'V1730',"BANKS":["WF00"],'bin':4},
-                   "NAsetup1":{"ADC":'V1725',"BANKS":["W200","W201","W202","W203"],'bin':4},
-                   "NAsetup2":{"ADC":'VX2740',"BANKS":["D000","D001"],'bin':8},
+        
+        MIDASconf={"V1725":{"ADC":'V1725',"BANKS":["W200","W201","W202","W203"],'bin':4},
+                   "V1730":{"ADC":'V1730',"BANKS":["WF00"],'bin':4},
+                   "V1725":{"ADC":'V1725',"BANKS":["W200","W201","W202","W203"],'bin':4},
+                   "VX2740":{"ADC":'VX2740',"BANKS":["D000","D001"],'bin':8},
+                   "VX2745":{"ADC":'VX2740',"BANKS":["D000","D001"],'bin':8}
                   }
-        data_format =  self.m.config('daq', 'data_format', 'str') # files_list
-        self.ADCmodel = MIDASconf[data_format]['ADC']             # adc_model
-        self.ADCbanks = MIDASconf[data_format]['BANKS']           # banks_list
+        self.data_format =  self.m.config('daq', 'data_format', 'str') # files_list
+        self.ADCbanks = MIDASconf[self.data_format]['BANKS']           # banks_list
         self.event_number=0
 
     def isADCbank(self,current_bank):
@@ -88,12 +89,14 @@ class MIDASreader:
                     self.__next_subrun__()
                     return self.read()
                 continue
-
-            if self.ADCmodel == 'V1725':
+            
+            if self.data_format == 'V1725':
                 raw = unpack_V1725()
-            elif self.ADCmodel == 'V1730':
+            elif self.data_format == 'V1730':
                 raw = unpack_V1730()
-            elif self.ADCmodel == 'VX2740':
+            elif self.data_format == 'VX2740':
+                raw = unpack_VX2740()
+            elif self.data_format == 'VX2745':
                 raw = unpack_VX2740()
             else:
                 raise ValueError(f'Unknown ADC model {self.ADCmodel}\nAvailable models V1725, V1730, VX2740')
@@ -229,4 +232,5 @@ class unpack_VX2740(unpack_ADC):
         slot4 = ((data>>48)&bitmask).reshape(nchans,nsamples,order='F')
         waveforms = np.vstack((slot1,slot2,slot3,slot4)).reshape(nchans,nsamples*4,order='F')
         self.adc_data=np.vstack([self.adc_data,waveforms]) if self.adc_data.size else waveforms
+
 
