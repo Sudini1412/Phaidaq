@@ -5,7 +5,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 from midas_liverpool import MIDASreader
 from config import Config
-import algos  
+from algos import Algos
 import time
 import numpy as np
 
@@ -18,7 +18,7 @@ import pandas as pd
 class AnaNA:
   def __init__(self,**configargs):
     self.config         = Config(**configargs)
-    self.algrt          = algos.Algos(**configargs)
+    self.algrt          = Algos(**configargs)
 
     # getting info from .ini files
     self.sampling         = self.config('daq', 'sampling', 'float') # S/s
