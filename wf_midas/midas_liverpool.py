@@ -191,7 +191,7 @@ class unpack_V1730(unpack_ADC):
 
 class unpack_VX2740(unpack_ADC):
     def __init__(self):
-        super().__init__('VX2740')
+        super().__init__('VX2740/5')
             
     def unpack(self,bank_data):
         self.unpackHeader(bank_data[:3])
