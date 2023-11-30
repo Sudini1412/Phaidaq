@@ -5,6 +5,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 from midas_liverpool import MIDASreader
 from config import Config
+import algos  
 import time
 import numpy as np
 
@@ -17,11 +18,12 @@ import pandas as pd
 class AnaNA:
   def __init__(self,**configargs):
     self.config         = Config(**configargs)
+    self.algrt          = algos.Algos(**configargs)
 
     # getting info from .ini files
     self.sampling         = self.config('daq', 'sampling', 'float') # S/s
     self.timebin          = 1e9/self.sampling # ns
-    self.baseline_to      = self.config('reco', 'bl_to', 'int')
+    self.baseline_tot      = self.config('reco', 'bl_to', 'int')
     self.n_trig_events    = self.config('roi', 'n_trigs', 'int')
     # number of samples to the left of the trigger position
     self.roi_left_samples = self.config('roi', 'roi_low', 'int')
@@ -114,7 +116,8 @@ class AnaNA:
           print(f'{nev:6d} events {time.time()-t1:1.3f}s / 1000 ev')
           t1 = time.time()
 
-        wfs = 1 * (event.adc_data) 
+        bal = self.algrt.get_baseline(event.adc_data, gate=self.baseline_tot)
+        wfs = 1 * (event.adc_data - bal) 
         self.plot_wf(wfs)
 
 
