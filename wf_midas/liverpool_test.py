@@ -13,9 +13,6 @@ import os, sys
 import pandas as pd
 #import msgpack
 
-# sys.path.append('/opt/exp_software/darkside/software/python_local_libraries/')
-# sys.path.append('/cvmfs/sft.cern.ch/lcg/views/LCG_96python3/x86_64-centos7-gcc8-opt/lib/python3.6/site-packages/')
-# sys.path.append('/cvmfs/sft.cern.ch/lcg/views/LCG_96python3/x86_64-centos7-gcc8-opt/lib')
 
 class AnaNA:
   def __init__(self,**configargs):
@@ -30,8 +27,6 @@ class AnaNA:
     self.roi_left_samples = self.config('roi', 'roi_low', 'int')
     # total number of samples in the ROI
     self.roi_tot_samples  = self.config('roi', 'roi_tot', 'int')
-    # settings 
-    self.channel_to_plot = -1
 
 
   def plot_wf(self,wfs):
@@ -98,9 +93,9 @@ class AnaNA:
      #Definiting time taken to read data 
      t0 = time.time()
      t1 = t0
-
+     
+     #Reading the midas file
      self.events   = MIDASreader(manager=self)
-
      
      empty_event = 0 
      
@@ -120,7 +115,7 @@ class AnaNA:
           t1 = time.time()
 
         wfs = 1 * (event.adc_data) 
-        #self.plot_wf(wfs)
+        self.plot_wf(wfs)
 
 
 
