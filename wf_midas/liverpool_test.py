@@ -25,6 +25,8 @@ class AnaNA:
     self.timebin          = 1e9/self.sampling # ns
     self.baseline_tot      = self.config('reco', 'bl_to', 'int')
     self.n_trig_events    = self.config('roi', 'n_trigs', 'int')
+    #Sample value to perform the running mean
+    self.running_mean_tot = self.config('pdm_reco','running_gate','int')
     # number of samples to the left of the trigger position
     self.roi_left_samples = self.config('roi', 'roi_low', 'int')
     # total number of samples in the ROI
@@ -98,7 +100,7 @@ class AnaNA:
      
      #Reading the midas file
      self.events   = MIDASreader(manager=self)
-     
+      
      empty_event = 0 
      
      #Loop to extract information from each events in all channels
@@ -116,9 +118,15 @@ class AnaNA:
           print(f'{nev:6d} events {time.time()-t1:1.3f}s / 1000 ev')
           t1 = time.time()
 
-        bal = self.algrt.get_baseline(event.adc_data, gate=self.baseline_tot)
-        wfs = 1 * (event.adc_data - bal) 
-        self.plot_wf(wfs)
+        #Retreving waveforms and recontruction analysis
+        bal = self.algrt.get_baseline(event.adc_data, gate=self.baseline_tot) #Getting the baseline of waveforms
+        rms = self.algrt.get_rms(event.adc_data, gate=self.baseline_tot) #Getting the baseline RMS of waveforms
+
+        wfs = 1 * (event.adc_data - bal) #Baseline subtraction
+        wfsRM = self.algrt.running_mean(wfs, gate = self.running_mean_tot) #Executing a running mean algorythm to smoothen out the waveforms
+
+        #self.plot_wf(wfsRM)
+        
 
 
 
