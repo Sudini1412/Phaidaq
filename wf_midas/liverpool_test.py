@@ -118,12 +118,13 @@ class AnaNA:
           print(f'{nev:6d} events {time.time()-t1:1.3f}s / 1000 ev')
           t1 = time.time()
 
-        #Retreving waveforms and recontruction analysis
+        #Retreving waveforms and general recontruction analysis
         bal = self.algrt.get_baseline(event.adc_data, gate=self.baseline_tot) #Getting the baseline of waveforms
         rms = self.algrt.get_rms(event.adc_data, gate=self.baseline_tot) #Getting the baseline RMS of waveforms
-
         wfs = 1 * (event.adc_data - bal) #Baseline subtraction
-        wfsRM = self.algrt.running_mean(wfs, gate = self.running_mean_tot) #Executing a running mean algorythm to smoothen out the waveforms
+        roi = self.algrt.get_roi(wfs, gate=self.roi_tot_samples, start=self.roi_left_samples) #ROI "integration by summing the array values together"
+        wfsRM = self.algrt.running_mean(wfs, gate =self.running_mean_tot) #Executing a running mean algorythm to smoothen out the waveforms
+        
 
         #self.plot_wf(wfsRM)
         
